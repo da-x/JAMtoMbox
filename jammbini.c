@@ -235,6 +235,19 @@ int _JAMPROC JAMmbCreate(JAMAPIRECptr apirec)
     return (1);
 }
 
+#ifdef __linux__
+#include <ctype.h>
+
+static char *strlwr(char *s)
+{
+  unsigned char *ucs = (unsigned char *) s;
+  for ( ; *ucs != '\0'; ucs++)
+    {
+      *ucs = tolower(*ucs);
+    }
+  return s;
+}
+#endif
 
 /*
 **  Reindex messages in an open message base pointed to by API structure.

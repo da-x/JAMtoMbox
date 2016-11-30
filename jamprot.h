@@ -91,7 +91,7 @@ JAMTMptr _JAMPROC JAMsysLocalTime(UINT32ptr pt);
 **  JAMsysAlign should be defined for platforms that requires INT16s
 **  and/or INT32s to be aligned on any boundary.
 */
-#if defined(__MSDOS__) || defined(__OS2__) || defined(_WINDOWS)
+#if defined(__MSDOS__) || defined(__OS2__) || defined(_WINDOWS) || defined(__linux__)
     #define JAMsysAlign(v)    (v)
 #elif defined(__sparc__)
     #define JAMsysAlign(v)    ((v)+(((v)%4)?(4-((v)%4)):0))

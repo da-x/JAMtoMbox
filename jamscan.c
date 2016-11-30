@@ -35,7 +35,7 @@
 int _JAMPROC JAMmbScanForMsgHdr(JAMAPIRECptr apirec, UINT32 WhatMsg,
                         int ScanFwd, ScanMsgHdrComp UserCompare)
 {
-    int     UserResult;
+    int     UserResult = 0;
     INT32   JunkL, MaxBlockToRead;
     UINT32  ReadBytes;
 

@@ -240,6 +240,8 @@ FHANDLE _JAMPROC JAMsysCreate(JAMAPIRECptr apirec, CHAR8ptr pFileName)
 #elif defined(__MSDOS__) && \
         (defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__))
     fh=_creat(pFileName, 0);
+#elif defined(__linux__)
+    fh=creat(pFileName, S_IRWXU);
 #else
     fh=creat(pFileName, S_IREAD|S_IWRITE);
 #endif
@@ -319,6 +321,8 @@ int _JAMPROC JAMsysLock(JAMAPIRECptr apirec, int DoLock)
         }
     return (0);
 #elif defined(__50SERIES)
+    return (0);
+#elif defined(__linux__)
     return (0);
 #else
     #error Unsupported platform
@@ -498,6 +502,8 @@ FHANDLE _JAMPROC JAMsysSopen(JAMAPIRECptr apirec, CHAR8ptr pFileName, int Access
 #elif defined(__MSDOS__) && \
         (defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__))
     fh=_open(pFileName, AccessMode|ShareMode);
+#elif defined(__linux__)
+    fh=open(pFileName, AccessMode|ShareMode);
 #else
     fh=sopen(pFileName, AccessMode, ShareMode, S_IREAD|S_IWRITE);
 #endif
@@ -746,7 +752,8 @@ UINT32 _JAMPROC JAMsysTime(UINT32ptr pTime)
 
     return(ti);
 #else
-    return(time(pTime));
+    time_t x;
+    return (time(&x));
 #endif
 }
 

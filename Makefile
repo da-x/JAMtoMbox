@@ -15,7 +15,7 @@
 #   Mats Wallin. ALL RIGHTS RESERVED.
 #
 CC      = gcc
-CFLAGS  = -c -ansi
+CFLAGS  = -O2 -Wall -c -ansi
 
 OBJS    = jamfetch.o jamfield.o jamhinfo.o jamlock.o\
           jamlread.o jammbini.o jamscan.o  jamstore.o\
@@ -27,3 +27,7 @@ OBJS    = jamfetch.o jamfield.o jamhinfo.o jamlock.o\
 libjamcapi.a:   $(OBJS)
 	ar rcv $@ $?
 	ranlib $@
+
+clean:
+	rm -f *.o *.a
+

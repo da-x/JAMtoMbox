@@ -169,6 +169,24 @@ extern "C" {
     #define _JAMPROC
     #define _JAMDATA
 
+#elif defined(__linux__)
+#include <stdint.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <time.h>
+    typedef int32_t             INT32;      /* 32 bits signed integer    */
+    typedef uint32_t            UINT32;     /* 32 bits unsigned integer */
+    typedef int16_t             INT16;      /* 16 bits signed integer     */
+    typedef uint16_t            UINT16;     /* 16 bits unsigned integer   */
+    typedef char                CHAR8;      /* 8 bits signed integer      */
+    typedef unsigned char       UCHAR8;     /* 8 bits unsigned integer    */
+    typedef int                 FHANDLE;    /* File handle                */
+
+    #define _JAMFAR
+    #define _JAMPROC
+    #define _JAMDATA
 #else
     #error Undefined platform
 #endif
@@ -213,6 +231,14 @@ typedef void _JAMDATA *         VOIDptr;
     #define JAMO_RDWR           2
     #define JAMO_RDONLY         0
     #define JAMO_WRONLY         1
+    #define JAMSH_DENYNO        0
+    #define JAMSH_DENYRD        0
+    #define JAMSH_DENYWR        0
+    #define JAMSH_DENYRW        0
+#elif defined(__linux__)
+    #define JAMO_RDWR           O_RDWR
+    #define JAMO_RDONLY         O_RDONLY
+    #define JAMO_WRONLY         O_WRONLY
     #define JAMSH_DENYNO        0
     #define JAMSH_DENYRD        0
     #define JAMSH_DENYWR        0
