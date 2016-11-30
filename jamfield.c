@@ -28,27 +28,30 @@
 **  is updated to point to the beginning of the found field.
 **  Returns 1 if the field is found and 0 if the field is not found.
 */
-int _JAMPROC JAMmbFindField(JAMAPIRECptr apirec, UINT32 WhatField, UINT32ptr Position)
+int _JAMPROC JAMmbFindField(JAMAPIRECptr apirec, UINT32 WhatField,
+			    UINT32ptr Position)
 {
-    *Position=JAMsysAlign(*Position);
-    while (1)
-        {
-        apirec->SubFieldPtr=(JAMSUBFIELD *) JAMsysAddPtr(apirec->WorkBuf, *Position);
-        if (apirec->SubFieldPtr->LoID==(UINT16)WhatField)
-            /* Found it */
-            return (1);
-        else
-            /* Get next subfield */
-            {
-            *Position+=(apirec->SubFieldPtr->DatLen+(UINT32)sizeof(JAMSUBFIELD));
-            *Position=JAMsysAlign(*Position);
-            if (*Position>=apirec->WorkLen)
-                return (0);
-            }
-        }/*while*/
+	*Position = JAMsysAlign(*Position);
+	while (1) {
+		apirec->SubFieldPtr =
+		    (JAMSUBFIELD *) JAMsysAddPtr(apirec->WorkBuf, *Position);
+		if (apirec->SubFieldPtr->LoID == (UINT16) WhatField)
+			/* Found it */
+			return (1);
+		else
+			/* Get next subfield */
+		{
+			*Position +=
+			    (apirec->SubFieldPtr->DatLen +
+			     (UINT32) sizeof(JAMSUBFIELD));
+			*Position = JAMsysAlign(*Position);
+			if (*Position >= apirec->WorkLen)
+				return (0);
+		}
+	}			/*while */
 
-    /* Dummy return to avoid warnings from some compilers */
-    return (0);
+	/* Dummy return to avoid warnings from some compilers */
+	return (0);
 }
 
 /*
@@ -61,30 +64,29 @@ int _JAMPROC JAMmbFindField(JAMAPIRECptr apirec, UINT32 WhatField, UINT32ptr Pos
 **  does not fit into WorkBuf
 */
 int _JAMPROC JAMmbAddField(JAMAPIRECptr apirec, UINT32 WhatField,
-                            int First, unsigned int DatLen,
-                            UINT32ptr Position, CHAR8ptr Data)
+			   int First, unsigned int DatLen,
+			   UINT32ptr Position, CHAR8ptr Data)
 {
-    if (First)
-        {
-        *Position=JAMsysAlign(*Position);
-        if (((UINT32)sizeof(JAMBINSUBFIELD)+(*Position)+DatLen)>apirec->WorkLen)
-            return (0);
-        apirec->SubFieldPtr=(JAMSUBFIELD *)JAMsysAddPtr(apirec->WorkBuf,*Position);
-        apirec->SubFieldPtr->LoID=(UINT16)WhatField;
-        apirec->SubFieldPtr->HiID=0;
-        apirec->SubFieldPtr->DatLen=0L;
-        *Position+=(UINT32)sizeof(JAMBINSUBFIELD);
-        }
-    else
-        {
-        if ((DatLen+(*Position))>apirec->WorkLen)
-            return (0);
-        }
+	if (First) {
+		*Position = JAMsysAlign(*Position);
+		if (((UINT32) sizeof(JAMBINSUBFIELD) + (*Position) + DatLen) >
+		    apirec->WorkLen)
+			return (0);
+		apirec->SubFieldPtr =
+		    (JAMSUBFIELD *) JAMsysAddPtr(apirec->WorkBuf, *Position);
+		apirec->SubFieldPtr->LoID = (UINT16) WhatField;
+		apirec->SubFieldPtr->HiID = 0;
+		apirec->SubFieldPtr->DatLen = 0L;
+		*Position += (UINT32) sizeof(JAMBINSUBFIELD);
+	} else {
+		if ((DatLen + (*Position)) > apirec->WorkLen)
+			return (0);
+	}
 
-    memcpy(JAMsysAddPtr(apirec->WorkBuf,*Position), Data, DatLen);
-    apirec->SubFieldPtr->DatLen+=DatLen;
-    *Position+=(UINT32)DatLen;
-    return (1);
+	memcpy(JAMsysAddPtr(apirec->WorkBuf, *Position), Data, DatLen);
+	apirec->SubFieldPtr->DatLen += DatLen;
+	*Position += (UINT32) DatLen;
+	return (1);
 }
 
 /* end of file "jamfield.c" */

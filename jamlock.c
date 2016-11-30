@@ -28,34 +28,30 @@
 */
 int _JAMPROC JAMmbLockMsgBase(JAMAPIRECptr apirec, int FetchHdrInfo)
 {
-    /* Make sure it's open */
-    if (!apirec->isOpen)
-        {
-        apirec->APImsg=JAMAPIMSG_ISNOTOPEN;
-        return (0);
-        }
+	/* Make sure it's open */
+	if (!apirec->isOpen) {
+		apirec->APImsg = JAMAPIMSG_ISNOTOPEN;
+		return (0);
+	}
 
-    /* Attempt to lock it if we don't already have a lock */
-    if (!apirec->HaveLock)
-        {
-        if (apirec->LockFunc(apirec, 1)<0)
-            {
-            apirec->APImsg=JAMAPIMSG_CANTLKFILE;
-            return (0);
-            }
-        /* Make sure we know about the lock */
-        apirec->HaveLock=1;
-        }
+	/* Attempt to lock it if we don't already have a lock */
+	if (!apirec->HaveLock) {
+		if (apirec->LockFunc(apirec, 1) < 0) {
+			apirec->APImsg = JAMAPIMSG_CANTLKFILE;
+			return (0);
+		}
+		/* Make sure we know about the lock */
+		apirec->HaveLock = 1;
+	}
 
-    /* Read header info block if told to */
-    if (FetchHdrInfo)
-        {
-        if (!JAMmbUpdateHeaderInfo(apirec, 0))
-            return (0);
-        }
+	/* Read header info block if told to */
+	if (FetchHdrInfo) {
+		if (!JAMmbUpdateHeaderInfo(apirec, 0))
+			return (0);
+	}
 
-    apirec->APImsg=JAMAPIMSG_NOTHING;
-    return (1);
+	apirec->APImsg = JAMAPIMSG_NOTHING;
+	return (1);
 }
 
 /*
@@ -65,32 +61,29 @@ int _JAMPROC JAMmbLockMsgBase(JAMAPIRECptr apirec, int FetchHdrInfo)
 */
 int _JAMPROC JAMmbUnLockMsgBase(JAMAPIRECptr apirec, int UpdateHdrInfo)
 {
-    /* Make sure it's open */
-    if (!apirec->isOpen)
-        {
-        apirec->APImsg=JAMAPIMSG_ISNOTOPEN;
-        return (0);
-        }
+	/* Make sure it's open */
+	if (!apirec->isOpen) {
+		apirec->APImsg = JAMAPIMSG_ISNOTOPEN;
+		return (0);
+	}
 
-    /* Make sure we have lock */
-    if (!apirec->HaveLock)
-        {
-        apirec->APImsg=JAMAPIMSG_ISNOTLOCKED;
-        return (0);
-        }
+	/* Make sure we have lock */
+	if (!apirec->HaveLock) {
+		apirec->APImsg = JAMAPIMSG_ISNOTLOCKED;
+		return (0);
+	}
 
-    /* Update header info if told to before unlocking */
-    if (UpdateHdrInfo)
-        {
-        if (!JAMmbUpdateHeaderInfo(apirec, 1))
-            return (0);
-        }
+	/* Update header info if told to before unlocking */
+	if (UpdateHdrInfo) {
+		if (!JAMmbUpdateHeaderInfo(apirec, 1))
+			return (0);
+	}
 
-    /* Unlock the file */
-    apirec->LockFunc(apirec, 0);
-    apirec->HaveLock=0;
-    apirec->APImsg=JAMAPIMSG_NOTHING;
-    return (1);
+	/* Unlock the file */
+	apirec->LockFunc(apirec, 0);
+	apirec->HaveLock = 0;
+	apirec->APImsg = JAMAPIMSG_NOTHING;
+	return (1);
 }
 
 /* end of file "jamlock.c" */

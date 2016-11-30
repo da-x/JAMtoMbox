@@ -28,41 +28,41 @@
 #include <string.h>
 
 #if defined(__MSDOS__) || defined(_WINDOWS)
-    #include <fcntl.h>
-    #include <io.h>
-    #include <share.h>
-    #include <dos.h>
+#include <fcntl.h>
+#include <io.h>
+#include <share.h>
+#include <dos.h>
 #endif
 
 #if defined(__TURBOC__) || defined(__BORLANDC__) || \
         defined(__ZTC__) || defined(_MSC_VER) || defined(_QC)
-    #include <sys\types.h>
-    #include <sys\stat.h>
+#include <sys\types.h>
+#include <sys\stat.h>
 #endif
 
 #if defined(__ZTC__) || defined(_MSC_VER) || defined(_QC)
-    #include <sys\locking.h>
+#include <sys\locking.h>
 #endif
 
 #if defined(__TSC__)
-    #include <stat.h>
-    #include <locking.h>
+#include <stat.h>
+#include <locking.h>
 #endif
 
 #if defined(__sparc__)
-    #include <fcntl.h>
-    #include <sys/file.h>
-    #include <memory.h>
-    #include <sys/time.h>
+#include <fcntl.h>
+#include <sys/file.h>
+#include <memory.h>
+#include <sys/time.h>
 #endif
 
 #if defined(__50SERIES)
-    #define unlink delete
+#define unlink delete
 #endif
 
 #if defined(_MSC_VER)
-    #define locking _locking
-    #define unlink  _unlink
+#define locking _locking
+#define unlink  _unlink
 #endif
 
 #include "jammb.h"
@@ -70,22 +70,21 @@
 /*
 **  Number of days since January 1, the 1st of each month
 */
-static int _mdays [13] =
-            {
-/* Jan */   0,
-/* Feb */   31,
-/* Mar */   31+28,
-/* Apr */   31+28+31,
-/* May */   31+28+31+30,
-/* Jun */   31+28+31+30+31,
-/* Jul */   31+28+31+30+31+30,
-/* Aug */   31+28+31+30+31+30+31,
-/* Sep */   31+28+31+30+31+30+31+31,
-/* Oct */   31+28+31+30+31+30+31+31+30,
-/* Nov */   31+28+31+30+31+30+31+31+30+31,
-/* Dec */   31+28+31+30+31+30+31+31+30+31+30,
-/* Jan */   31+28+31+30+31+30+31+31+30+31+30+31
-            };
+static int _mdays[13] = {
+/* Jan */ 0,
+/* Feb */ 31,
+/* Mar */ 31 + 28,
+/* Apr */ 31 + 28 + 31,
+/* May */ 31 + 28 + 31 + 30,
+/* Jun */ 31 + 28 + 31 + 30 + 31,
+/* Jul */ 31 + 28 + 31 + 30 + 31 + 30,
+/* Aug */ 31 + 28 + 31 + 30 + 31 + 30 + 31,
+/* Sep */ 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31,
+/* Oct */ 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30,
+/* Nov */ 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31,
+/* Dec */ 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30,
+/* Jan */ 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 31 + 30 + 31
+};
 
 /*
 **  JAMsysInitApiRec
@@ -101,54 +100,51 @@ static int _mdays [13] =
 */
 int _JAMPROC JAMsysInitApiRec(JAMAPIRECptr apirec, CHAR8ptr pFile, UINT32 Size)
 {
-    memset(apirec, 0, sizeof(JAMAPIREC));
+	memset(apirec, 0, sizeof(JAMAPIREC));
 
 #if defined(_WINDOWS)
-        {
-        HGLOBAL   hMem;
+	{
+		HGLOBAL hMem;
 
-        if ((hMem = GlobalAlloc (GPTR, Size)) != (HGLOBAL) NULL)
-            if ((apirec->WorkBuf = GlobalLock (hMem)) == NULL)
-                GlobalFree (hMem);
-        }
+		if ((hMem = GlobalAlloc(GPTR, Size)) != (HGLOBAL) NULL)
+			if ((apirec->WorkBuf = GlobalLock(hMem)) == NULL)
+				GlobalFree(hMem);
+	}
 #else
-    apirec->WorkBuf=malloc((unsigned int)Size);
+	apirec->WorkBuf = malloc((unsigned int)Size);
 #endif
-    if (apirec->WorkBuf==NULL)
-        return (0);
+	if (apirec->WorkBuf == NULL)
+		return (0);
 
-    strcpy(apirec->BaseName, pFile);
-    apirec->WorkLen=Size;
+	strcpy(apirec->BaseName, pFile);
+	apirec->WorkLen = Size;
 
-    apirec->HdrHandle=
-        apirec->TxtHandle=
-            apirec->IdxHandle=
-                apirec->LrdHandle=-1;
+	apirec->HdrHandle =
+	    apirec->TxtHandle = apirec->IdxHandle = apirec->LrdHandle = -1;
 
-    apirec->CreateFunc = JAMsysCreate;
-    apirec->OpenFunc   = JAMsysOpen;
-    apirec->CloseFunc  = JAMsysClose;
-    apirec->ReadFunc   = JAMsysRead;
-    apirec->WriteFunc  = JAMsysWrite;
-    apirec->SeekFunc   = JAMsysSeek;
-    apirec->LockFunc   = JAMsysLock;
-    apirec->UnlinkFunc = JAMsysUnlink;
+	apirec->CreateFunc = JAMsysCreate;
+	apirec->OpenFunc = JAMsysOpen;
+	apirec->CloseFunc = JAMsysClose;
+	apirec->ReadFunc = JAMsysRead;
+	apirec->WriteFunc = JAMsysWrite;
+	apirec->SeekFunc = JAMsysSeek;
+	apirec->LockFunc = JAMsysLock;
+	apirec->UnlinkFunc = JAMsysUnlink;
 
 #if defined(_WINDOWS)
-        {
-        UINT16  WinVer;
+	{
+		UINT16 WinVer;
 
-        WinVer = LOWORD (GetVersion ());
-        if (LOBYTE (WinVer) > 3 ||
-            (LOBYTE (WinVer) == 3 && HIBYTE (WinVer) >= 10))
-            {
-            apirec->ReadFunc  = JAMsysReadHuge;
-            apirec->WriteFunc = JAMsysWriteHuge;
-            }
-        }
+		WinVer = LOWORD(GetVersion());
+		if (LOBYTE(WinVer) > 3 ||
+		    (LOBYTE(WinVer) == 3 && HIBYTE(WinVer) >= 10)) {
+			apirec->ReadFunc = JAMsysReadHuge;
+			apirec->WriteFunc = JAMsysWriteHuge;
+		}
+	}
 #endif
 
-    return (1);
+	return (1);
 }
 
 /*
@@ -164,29 +160,29 @@ int _JAMPROC JAMsysInitApiRec(JAMAPIRECptr apirec, CHAR8ptr pFile, UINT32 Size)
 */
 int _JAMPROC JAMsysDeinitApiRec(JAMAPIRECptr apirec)
 {
-    /*This will release any locks we might has as well*/
-    if (apirec->isOpen)
-        JAMmbClose(apirec);
+	/*This will release any locks we might has as well */
+	if (apirec->isOpen)
+		JAMmbClose(apirec);
 
-    if (apirec->WorkBuf!=NULL)
-        {
+	if (apirec->WorkBuf != NULL) {
 #if defined(_WINDOWS)
-        HGLOBAL     hMem;
+		HGLOBAL hMem;
 
-        hMem = (HGLOBAL) LOWORD (GlobalHandle (SELECTOROF (apirec->WorkBuf)));
-        GlobalUnlock (hMem);
-        GlobalFree (hMem);
+		hMem =
+		    (HGLOBAL) LOWORD(GlobalHandle(SELECTOROF(apirec->WorkBuf)));
+		GlobalUnlock(hMem);
+		GlobalFree(hMem);
 #else
-        free(apirec->WorkBuf);
+		free(apirec->WorkBuf);
 #endif
-        }
+	}
 
-    apirec->WorkBuf=NULL;
-    apirec->WorkLen=0L;
+	apirec->WorkBuf = NULL;
+	apirec->WorkLen = 0L;
 
-    apirec->BaseName[0]='\0';
+	apirec->BaseName[0] = '\0';
 
-    return (1);
+	return (1);
 }
 
 /*
@@ -202,20 +198,20 @@ int _JAMPROC JAMsysDeinitApiRec(JAMAPIRECptr apirec)
 int _JAMPROC JAMsysClose(JAMAPIRECptr apirec, FHANDLE fh)
 {
 #if defined(_WINDOWS)
-    if (_lclose(fh)==HFILE_ERROR)
+	if (_lclose(fh) == HFILE_ERROR)
 #elif defined(__MSDOS__) && \
         (defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__))
-    if (_close(fh)<0)
+	if (_close(fh) < 0)
 #else
-    if (close(fh)<0)
+	if (close(fh) < 0)
 #endif
-        {
-        if (apirec)
-            apirec->Errno=errno;
-        return (-1);
-        }
+	{
+		if (apirec)
+			apirec->Errno = errno;
+		return (-1);
+	}
 
-    return (0);
+	return (0);
 }
 
 /*
@@ -231,34 +227,33 @@ int _JAMPROC JAMsysClose(JAMAPIRECptr apirec, FHANDLE fh)
 */
 FHANDLE _JAMPROC JAMsysCreate(JAMAPIRECptr apirec, CHAR8ptr pFileName)
 {
-    FHANDLE fh;
+	FHANDLE fh;
 
 #if defined(__50SERIES)
-    fh=creat(pFileName, 2);
+	fh = creat(pFileName, 2);
 #elif defined(_WINDOWS)
-    fh=_lcreat(pFileName, 0);
+	fh = _lcreat(pFileName, 0);
 #elif defined(__MSDOS__) && \
         (defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__))
-    fh=_creat(pFileName, 0);
+	fh = _creat(pFileName, 0);
 #elif defined(__linux__)
-    fh=creat(pFileName, S_IRWXU);
+	fh = creat(pFileName, S_IRWXU);
 #else
-    fh=creat(pFileName, S_IREAD|S_IWRITE);
+	fh = creat(pFileName, S_IREAD | S_IWRITE);
 #endif
-    if (fh<0)
-        {
-        if (apirec)
-            apirec->Errno = errno;
-        return (-1);
-        }
+	if (fh < 0) {
+		if (apirec)
+			apirec->Errno = errno;
+		return (-1);
+	}
 
-    if (JAMsysClose(apirec, fh)<0)
-        return (-1);
+	if (JAMsysClose(apirec, fh) < 0)
+		return (-1);
 
 #if defined(__sparc__) || defined(__50SERIES)
-    return (fh);
+	return (fh);
 #else
-    return (JAMsysOpen(apirec, pFileName));
+	return (JAMsysOpen(apirec, pFileName));
 #endif
 }
 
@@ -277,55 +272,54 @@ FHANDLE _JAMPROC JAMsysCreate(JAMAPIRECptr apirec, CHAR8ptr pFileName)
 int _JAMPROC JAMsysLock(JAMAPIRECptr apirec, int DoLock)
 {
 #if defined(__MSDOS__) || defined(_WINDOWS)
-    #if defined(__TURBOC__) || defined(__BORLANDC__)
-        int stat;
+#if defined(__TURBOC__) || defined(__BORLANDC__)
+	int stat;
 
-        if (DoLock)
-            stat=lock(apirec->HdrHandle, 0L, 1L);
-        else 
-            stat=unlock(apirec->HdrHandle, 0L, 1L);
+	if (DoLock)
+		stat = lock(apirec->HdrHandle, 0L, 1L);
+	else
+		stat = unlock(apirec->HdrHandle, 0L, 1L);
 
-        if (stat==-1)
-            apirec->Errno=errno;
+	if (stat == -1)
+		apirec->Errno = errno;
 
-        return (stat);
-    #elif defined(__TSC__) || defined(__ZTC__) || \
+	return (stat);
+#elif defined(__TSC__) || defined(__ZTC__) || \
               defined(_MSC_VER) || defined(_QC)
-        int   stat;
-        INT32 OldPos;
+	int stat;
+	INT32 OldPos;
 
-        /*Get old position*/
-        OldPos=JAMsysSeek(apirec, apirec->HdrHandle, JAMSEEK_CUR, 0L);
-        if (OldPos<0L)
-            return (-1);
+	/*Get old position */
+	OldPos = JAMsysSeek(apirec, apirec->HdrHandle, JAMSEEK_CUR, 0L);
+	if (OldPos < 0L)
+		return (-1);
 
-        /*Move to beginning of file*/
-        if (JAMsysSeek(apirec, apirec->HdrHandle, JAMSEEK_SET, 0L)<0L)
-            return (-1);
+	/*Move to beginning of file */
+	if (JAMsysSeek(apirec, apirec->HdrHandle, JAMSEEK_SET, 0L) < 0L)
+		return (-1);
 
-        stat=locking(apirec->HdrHandle, DoLock ? LK_NBLCK:LK_UNLCK, 1L);
+	stat = locking(apirec->HdrHandle, DoLock ? LK_NBLCK : LK_UNLCK, 1L);
 
-        /*Restore position*/
-        JAMsysSeek(apirec, apirec->HdrHandle, JAMSEEK_SET, OldPos);
+	/*Restore position */
+	JAMsysSeek(apirec, apirec->HdrHandle, JAMSEEK_SET, OldPos);
 
-        return (stat);
-    #else
-        #error Unsupported compiler
-    #endif
-#elif defined(__sparc__)
-    DoLock = DoLock ? LOCK_EX : LOCK_UN;
-    if (flock(apirec->HdrHandle, DoLock) == -1)
-        {
-        apirec->Errno = errno;
-        return (-1);
-        }
-    return (0);
-#elif defined(__50SERIES)
-    return (0);
-#elif defined(__linux__)
-    return (0);
+	return (stat);
 #else
-    #error Unsupported platform
+#error Unsupported compiler
+#endif
+#elif defined(__sparc__)
+	DoLock = DoLock ? LOCK_EX : LOCK_UN;
+	if (flock(apirec->HdrHandle, DoLock) == -1) {
+		apirec->Errno = errno;
+		return (-1);
+	}
+	return (0);
+#elif defined(__50SERIES)
+	return (0);
+#elif defined(__linux__)
+	return (0);
+#else
+#error Unsupported platform
 #endif
 }
 
@@ -341,10 +335,10 @@ int _JAMPROC JAMsysLock(JAMAPIRECptr apirec, int DoLock)
 */
 FHANDLE _JAMPROC JAMsysOpen(JAMAPIRECptr apirec, CHAR8ptr pFileName)
 {
-    FHANDLE fh;
+	FHANDLE fh;
 
-    fh=JAMsysSopen (apirec, pFileName, JAMO_RDWR, JAMSH_DENYNO);
-    return (fh);
+	fh = JAMsysSopen(apirec, pFileName, JAMO_RDWR, JAMSH_DENYNO);
+	return (fh);
 }
 
 /*
@@ -362,59 +356,60 @@ FHANDLE _JAMPROC JAMsysOpen(JAMAPIRECptr apirec, CHAR8ptr pFileName)
 **  NOTE! In small and medium memory model, the maximum size that can
 **        be read is 0xFF00 bytes
 */
-INT32 _JAMPROC JAMsysRead(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, INT32 Len)
+INT32 _JAMPROC JAMsysRead(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf,
+			  INT32 Len)
 {
-    INT32       TotalRead = 0;
+	INT32 TotalRead = 0;
 
 #if defined(__MSDOS__) || defined(_WINDOWS)
-    UCHAR8    * Ptr       = pBuf;
+	UCHAR8 *Ptr = pBuf;
 
-    while(Len)
-        {
-        UINT16  ToRead,
-                BytesRead;
+	while (Len) {
+		UINT16 ToRead, BytesRead;
 
-        ToRead = (UINT16) ((Len > 0xFF00L) ? 0xFF00u : (UINT16) Len);
+		ToRead = (UINT16) ((Len > 0xFF00L) ? 0xFF00u : (UINT16) Len);
 
 #if defined(_WINDOWS)
-        if((BytesRead = (UINT16) _lread(fh, Ptr, ToRead)) == (UINT16) HFILE_ERROR)
+		if ((BytesRead =
+		     (UINT16) _lread(fh, Ptr, ToRead)) == (UINT16) HFILE_ERROR)
 #elif defined(__MSDOS__) && \
           (defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__))
-        if((BytesRead = (UINT16) _read(fh, Ptr, ToRead)) == (UINT16) -1)
+		if ((BytesRead =
+		     (UINT16) _read(fh, Ptr, ToRead)) == (UINT16) - 1)
 #else
-        if((BytesRead = (UINT16) read(fh, Ptr, ToRead)) == (UINT16) -1)
+		if ((BytesRead =
+		     (UINT16) read(fh, Ptr, ToRead)) == (UINT16) - 1)
 #endif
-            {
-            if (apirec)
-                apirec->Errno = errno;
-            return(-1);
-            }
+		{
+			if (apirec)
+				apirec->Errno = errno;
+			return (-1);
+		}
 
-        TotalRead += BytesRead;
-        if(BytesRead != ToRead)
-            return(TotalRead);
+		TotalRead += BytesRead;
+		if (BytesRead != ToRead)
+			return (TotalRead);
 
 #if defined(__SMALL__) || defined(__MEDIUM__)
-        return(TotalRead);
+		return (TotalRead);
 #else
-        Len -= BytesRead;
-        Ptr = JAMsysAddPtr(Ptr, (INT32) BytesRead);
+		Len -= BytesRead;
+		Ptr = JAMsysAddPtr(Ptr, (INT32) BytesRead);
 #endif
-        }
+	}
 
-    return(TotalRead);
+	return (TotalRead);
 
-#else   /* #if defined(__MSDOS__) || defined(_WINDOWS) */
+#else /* #if defined(__MSDOS__) || defined(_WINDOWS) */
 
-    if((TotalRead = read(fh, pBuf, Len )) == -1)
-        {
-        if (apirec)
-            apirec->Errno = errno;
-        }
+	if ((TotalRead = read(fh, pBuf, Len)) == -1) {
+		if (apirec)
+			apirec->Errno = errno;
+	}
 
-    return(TotalRead);
+	return (TotalRead);
 
-#endif  /* #ifdef __MSDOS__ */
+#endif /* #ifdef __MSDOS__ */
 }
 
 #if defined(_WINDOWS)
@@ -435,17 +430,17 @@ INT32 _JAMPROC JAMsysRead(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, INT32 L
 **
 **         Returns: The number of bytes read, or -1 in the case of error
 */
-INT32 _JAMPROC JAMsysReadHuge(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, INT32 Len)
+INT32 _JAMPROC JAMsysReadHuge(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf,
+			      INT32 Len)
 {
-    INT32       TotalRead;
+	INT32 TotalRead;
 
-    if((TotalRead = _hread(fh, (void _HUGE *) pBuf, Len )) == -1)
-        {
-        if (apirec)
-            apirec->Errno = errno;
-        }
+	if ((TotalRead = _hread(fh, (void _HUGE *)pBuf, Len)) == -1) {
+		if (apirec)
+			apirec->Errno = errno;
+	}
 
-    return(TotalRead);
+	return (TotalRead);
 }
 #endif /* #if defined(_WINDOWS) */
 
@@ -462,21 +457,22 @@ INT32 _JAMPROC JAMsysReadHuge(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, INT
 **         Returns:   The new offset of the file pointer, from the beginning
 **                    of the file, or -1L in the case of error
 */
-INT32 _JAMPROC JAMsysSeek(JAMAPIRECptr apirec, FHANDLE fh, int FromWhere, INT32 Offset)
+INT32 _JAMPROC JAMsysSeek(JAMAPIRECptr apirec, FHANDLE fh, int FromWhere,
+			  INT32 Offset)
 {
-    INT32   NewOffset;
+	INT32 NewOffset;
 
 #if defined(_WINDOWS)
-    if((NewOffset = _llseek(fh, Offset, FromWhere)) == HFILE_ERROR)
+	if ((NewOffset = _llseek(fh, Offset, FromWhere)) == HFILE_ERROR)
 #else
-    if((NewOffset = lseek(fh, Offset, FromWhere)) == -1L)
+	if ((NewOffset = lseek(fh, Offset, FromWhere)) == -1L)
 #endif
-        {
-        if (apirec)
-            apirec->Errno = errno;
-        }
+	{
+		if (apirec)
+			apirec->Errno = errno;
+	}
 
-    return(NewOffset);
+	return (NewOffset);
 }
 
 /*
@@ -491,29 +487,29 @@ INT32 _JAMPROC JAMsysSeek(JAMAPIRECptr apirec, FHANDLE fh, int FromWhere, INT32 
 **
 **         Returns:   The filehandle when successful, -1 if it fails
 */
-FHANDLE _JAMPROC JAMsysSopen(JAMAPIRECptr apirec, CHAR8ptr pFileName, int AccessMode, int ShareMode)
+FHANDLE _JAMPROC JAMsysSopen(JAMAPIRECptr apirec, CHAR8ptr pFileName,
+			     int AccessMode, int ShareMode)
 {
-    FHANDLE fh;
+	FHANDLE fh;
 
 #if defined(__sparc__) || defined(__50SERIES)
-    fh=open(pFileName, AccessMode);
+	fh = open(pFileName, AccessMode);
 #elif defined(_WINDOWS)
-    fh=_lopen(pFileName, AccessMode|ShareMode);
+	fh = _lopen(pFileName, AccessMode | ShareMode);
 #elif defined(__MSDOS__) && \
         (defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__))
-    fh=_open(pFileName, AccessMode|ShareMode);
+	fh = _open(pFileName, AccessMode | ShareMode);
 #elif defined(__linux__)
-    fh=open(pFileName, AccessMode|ShareMode);
+	fh = open(pFileName, AccessMode | ShareMode);
 #else
-    fh=sopen(pFileName, AccessMode, ShareMode, S_IREAD|S_IWRITE);
+	fh = sopen(pFileName, AccessMode, ShareMode, S_IREAD | S_IWRITE);
 #endif
-    if (fh<0)
-        {
-        if (apirec)
-            apirec->Errno=errno;
-        }
+	if (fh < 0) {
+		if (apirec)
+			apirec->Errno = errno;
+	}
 
-    return (fh);
+	return (fh);
 }
 
 /*
@@ -528,14 +524,13 @@ FHANDLE _JAMPROC JAMsysSopen(JAMAPIRECptr apirec, CHAR8ptr pFileName, int Access
 */
 int _JAMPROC JAMsysUnlink(JAMAPIRECptr apirec, CHAR8ptr pFileName)
 {
-    if(unlink(pFileName) == -1)
-        {
-        if (apirec)
-            apirec->Errno = errno;
-        return(-1);
-        }
+	if (unlink(pFileName) == -1) {
+		if (apirec)
+			apirec->Errno = errno;
+		return (-1);
+	}
 
-    return(0);
+	return (0);
 }
 
 /*
@@ -553,59 +548,60 @@ int _JAMPROC JAMsysUnlink(JAMAPIRECptr apirec, CHAR8ptr pFileName)
 **  NOTE! In small and medium memory model, the maximum size that can
 **        be written is 0xFF00 bytes
 */
-INT32 _JAMPROC JAMsysWrite(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, INT32 Len)
+INT32 _JAMPROC JAMsysWrite(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf,
+			   INT32 Len)
 {
-    INT32       TotalWrit = 0L;
+	INT32 TotalWrit = 0L;
 
 #if defined(__MSDOS__) || defined(_WINDOWS)
-    UCHAR8    * Ptr       = pBuf;
+	UCHAR8 *Ptr = pBuf;
 
-    while(Len)
-        {
-        UINT16  ToWrit,
-                BytesWrit;
+	while (Len) {
+		UINT16 ToWrit, BytesWrit;
 
-        ToWrit = (UINT16) ((Len > 0xFF00L) ? 0xFF00u : (UINT16) Len);
+		ToWrit = (UINT16) ((Len > 0xFF00L) ? 0xFF00u : (UINT16) Len);
 
 #if defined(_WINDOWS)
-        if((BytesWrit = (UINT16) _lwrite(fh, Ptr, ToWrit)) == (UINT16) HFILE_ERROR)
+		if ((BytesWrit =
+		     (UINT16) _lwrite(fh, Ptr, ToWrit)) == (UINT16) HFILE_ERROR)
 #elif defined(__MSDOS__) && \
           (defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__))
-        if((BytesWrit = (UINT16) _write(fh, Ptr, ToWrit)) == (UINT16) -1)
+		if ((BytesWrit =
+		     (UINT16) _write(fh, Ptr, ToWrit)) == (UINT16) - 1)
 #else
-        if((BytesWrit = (UINT16) write(fh, Ptr, ToWrit)) == (UINT16) -1)
+		if ((BytesWrit =
+		     (UINT16) write(fh, Ptr, ToWrit)) == (UINT16) - 1)
 #endif
-            {
-            if (apirec)
-                apirec->Errno = errno;
-            return(-1L);
-            }
+		{
+			if (apirec)
+				apirec->Errno = errno;
+			return (-1L);
+		}
 
-        TotalWrit += BytesWrit;
-        if(BytesWrit != ToWrit)
-            return(TotalWrit);
+		TotalWrit += BytesWrit;
+		if (BytesWrit != ToWrit)
+			return (TotalWrit);
 
 #if defined(__SMALL__) || defined(__MEDIUM__)
-        return(TotalWrit);
+		return (TotalWrit);
 #else
-        Len -= BytesWrit;
-        Ptr = JAMsysAddPtr(Ptr, (INT32) BytesWrit);
+		Len -= BytesWrit;
+		Ptr = JAMsysAddPtr(Ptr, (INT32) BytesWrit);
 #endif
-        }
+	}
 
-    return(TotalWrit);
+	return (TotalWrit);
 
-#else   /* #if defined(__MSDOS__) || defined(_WINDOWS) */
+#else /* #if defined(__MSDOS__) || defined(_WINDOWS) */
 
-    if((TotalWrit = write(fh, pBuf, Len)) == -1)
-        {
-        if (apirec)
-            apirec->Errno = errno;
-        }
-  
-    return(TotalWrit);
+	if ((TotalWrit = write(fh, pBuf, Len)) == -1) {
+		if (apirec)
+			apirec->Errno = errno;
+	}
 
-#endif  /* #ifdef __MSDOS__ */
+	return (TotalWrit);
+
+#endif /* #ifdef __MSDOS__ */
 }
 
 #if defined(_WINDOWS)
@@ -626,17 +622,17 @@ INT32 _JAMPROC JAMsysWrite(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, INT32 
 **
 **         Returns:   The number of bytes written, or -1 in the case of error
 */
-INT32 _JAMPROC JAMsysWriteHuge(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, INT32 Len)
+INT32 _JAMPROC JAMsysWriteHuge(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf,
+			       INT32 Len)
 {
-    INT32       TotalWrit;
+	INT32 TotalWrit;
 
-    if((TotalWrit = _hwrite(fh, (void _HUGE *) pBuf, Len)) == -1)
-        {
-        if (apirec)
-            apirec->Errno = errno;
-        }
-  
-    return(TotalWrit);
+	if ((TotalWrit = _hwrite(fh, (void _HUGE *)pBuf, Len)) == -1) {
+		if (apirec)
+			apirec->Errno = errno;
+	}
+
+	return (TotalWrit);
 
 }
 #endif /* #if defined(_WINDOWS) */
@@ -659,20 +655,20 @@ INT32 _JAMPROC JAMsysWriteHuge(JAMAPIRECptr apirec, FHANDLE fh, VOIDptr pBuf, IN
 **         Returns:   The new pointer after the offset has been added
 */
 #if defined(__SMALL__) || defined(__MEDIUM__)
-void _JAMFAR * _JAMPROC JAMsysAddFarPtr(void _JAMFAR *Ptr, INT32 Offset)
+void _JAMFAR *_JAMPROC JAMsysAddFarPtr(void _JAMFAR * Ptr, INT32 Offset)
 #else
-void _JAMFAR * _JAMPROC JAMsysAddPtr(void _JAMFAR *Ptr, INT32 Offset)
+void _JAMFAR *_JAMPROC JAMsysAddPtr(void _JAMFAR * Ptr, INT32 Offset)
 #endif
 {
-    INT32   lPtr;
+	INT32 lPtr;
 
-    lPtr = ((INT32) *((UINT16 *) &Ptr)) +
-           ((INT32) (*((UINT16 *) &Ptr + 1)) << 4) +
-           Offset;
+	lPtr = ((INT32) * ((UINT16 *) & Ptr)) +
+	    ((INT32) (*((UINT16 *) & Ptr + 1)) << 4) + Offset;
 
-    return((void _JAMFAR *) (((INT32) ((UINT16) lPtr & 0x000F)) | ((lPtr & 0x000FFFF0uL) << 12)));
+	return ((void _JAMFAR *)(((INT32) ((UINT16) lPtr & 0x000F)) |
+				 ((lPtr & 0x000FFFF0uL) << 12)));
 }
-#endif  /* #if defined(__MSDOS__) */
+#endif /* #if defined(__MSDOS__) */
 
 /*
 **  JAMsysTime
@@ -688,72 +684,72 @@ void _JAMFAR * _JAMPROC JAMsysAddPtr(void _JAMFAR *Ptr, INT32 Offset)
 UINT32 _JAMPROC JAMsysTime(UINT32ptr pTime)
 {
 #if defined(__MSDOS__) || defined(_WINDOWS)
-    #if defined(__ZTC__) || defined(_MSC_VER) || defined(_QC)
-        #if defined(__ZTC__)
-            struct dos_date_t   d;
-            struct dos_time_t   t;
-        #elif defined (_MSC_VER) || defined(_QC)
-            struct _dosdate_t   d;
-            struct _dostime_t   t;
-        #endif
+#if defined(__ZTC__) || defined(_MSC_VER) || defined(_QC)
+#if defined(__ZTC__)
+	struct dos_date_t d;
+	struct dos_time_t t;
+#elif defined (_MSC_VER) || defined(_QC)
+	struct _dosdate_t d;
+	struct _dostime_t t;
+#endif
 
-        struct JAMtm  m;
-        UINT32        ti;
+	struct JAMtm m;
+	UINT32 ti;
 
-        #if defined(__ZTC__)
-            dos_getdate(&d);
-            dos_gettime(&t);
-        #elif defined (_MSC_VER) || defined(_QC)
-            _dos_getdate(&d);
-            _dos_gettime(&t);
-        #endif
+#if defined(__ZTC__)
+	dos_getdate(&d);
+	dos_gettime(&t);
+#elif defined (_MSC_VER) || defined(_QC)
+	_dos_getdate(&d);
+	_dos_gettime(&t);
+#endif
 
-        m.tm_year = d.year - 1900;
-        m.tm_mon  = d.month - 1;
-        m.tm_mday = d.day;
-        m.tm_hour = t.hour;
-        m.tm_min  = t.minute;
-        m.tm_sec  = t.second;
-    #elif defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__)
-        struct date   d;
-        struct time   t;
-        struct JAMtm  m;
-        UINT32        ti;
+	m.tm_year = d.year - 1900;
+	m.tm_mon = d.month - 1;
+	m.tm_mday = d.day;
+	m.tm_hour = t.hour;
+	m.tm_min = t.minute;
+	m.tm_sec = t.second;
+#elif defined(__TURBOC__) || defined(__BORLANDC__) || defined(__TSC__)
+	struct date d;
+	struct time t;
+	struct JAMtm m;
+	UINT32 ti;
 
-        getdate(&d);
-        gettime(&t);
+	getdate(&d);
+	gettime(&t);
 
-        m.tm_year = d.da_year - 1900;
-        m.tm_mon  = d.da_mon - 1;
-        m.tm_mday = d.da_day;
-        m.tm_hour = t.ti_hour;
-        m.tm_min  = t.ti_min;
-        m.tm_sec  = t.ti_sec;
-    #endif
+	m.tm_year = d.da_year - 1900;
+	m.tm_mon = d.da_mon - 1;
+	m.tm_mday = d.da_day;
+	m.tm_hour = t.ti_hour;
+	m.tm_min = t.ti_min;
+	m.tm_sec = t.ti_sec;
+#endif
 #elif defined(__OS2__)
-          DATETIME      DT;
-    struct JAMtm  m;
-    UINT32        ti;
+	DATETIME DT;
+	struct JAMtm m;
+	UINT32 ti;
 
-    DosGetDateTime(&DT);
+	DosGetDateTime(&DT);
 
-    m.tm_year = DT.year - 1900;
-    m.tm_mon  = DT.month - 1;
-    m.tm_day  = DT.day;
-    m.tm_hour = DT.hours;
-    m.tm_min  = DT.minutes;
-    m.tm_sec  = DT.seconds;
+	m.tm_year = DT.year - 1900;
+	m.tm_mon = DT.month - 1;
+	m.tm_day = DT.day;
+	m.tm_hour = DT.hours;
+	m.tm_min = DT.minutes;
+	m.tm_sec = DT.seconds;
 #endif
 
 #if defined(__MSDOS__) || defined(_WINDOWS) || defined(__OS2__)
-    ti = JAMsysMkTime(&m);
-    if(pTime)
-        *pTime = ti;
+	ti = JAMsysMkTime(&m);
+	if (pTime)
+		*pTime = ti;
 
-    return(ti);
+	return (ti);
 #else
-    time_t x;
-    return (time(&x));
+	time_t x;
+	return (time(&x));
 #endif
 }
 
@@ -769,24 +765,24 @@ UINT32 _JAMPROC JAMsysTime(UINT32ptr pTime)
 */
 UINT32 _JAMPROC JAMsysMkTime(JAMTMptr pTm)
 {
-    UINT32  Days;
-    int     Years;
+	UINT32 Days;
+	int Years;
 
-    /*Get number of years since 1970*/
-    Years = pTm->tm_year - 70;
+	/*Get number of years since 1970 */
+	Years = pTm->tm_year - 70;
 
-    /*Calculate number of days during these years,*/
-    /*including extra days for leap years         */
-    Days = Years * 365 + ((Years + 1) / 4);
+	/*Calculate number of days during these years, */
+	/*including extra days for leap years         */
+	Days = Years * 365 + ((Years + 1) / 4);
 
-    /*Add the number of days during this year*/
-    Days += _mdays [pTm->tm_mon] + pTm->tm_mday - 1;
-    if((pTm->tm_year & 3) == 0 && pTm->tm_mon > 1)
-        Days++;
+	/*Add the number of days during this year */
+	Days += _mdays[pTm->tm_mon] + pTm->tm_mday - 1;
+	if ((pTm->tm_year & 3) == 0 && pTm->tm_mon > 1)
+		Days++;
 
-    /*Convert to seconds, and add the number of seconds this day*/
-    return(((UINT32) Days * 86400L) + ((UINT32) pTm->tm_hour * 3600L) +
-           ((UINT32) pTm->tm_min * 60L) + (UINT32) pTm->tm_sec);
+	/*Convert to seconds, and add the number of seconds this day */
+	return (((UINT32) Days * 86400L) + ((UINT32) pTm->tm_hour * 3600L) +
+		((UINT32) pTm->tm_min * 60L) + (UINT32) pTm->tm_sec);
 }
 
 /*
@@ -801,35 +797,39 @@ UINT32 _JAMPROC JAMsysMkTime(JAMTMptr pTm)
 */
 JAMTMptr _JAMPROC JAMsysLocalTime(UINT32ptr pt)
 {
-    static struct JAMtm   m;
-    INT32                 t = *pt;
-    int                   LeapDay;
+	static struct JAMtm m;
+	INT32 t = *pt;
+	int LeapDay;
 
-    m.tm_sec  = (int) (t % 60); t /= 60;
-    m.tm_min  = (int) (t % 60); t /= 60;
-    m.tm_hour = (int) (t % 24); t /= 24;
-    m.tm_wday = (int) ((t + 4) % 7);
+	m.tm_sec = (int)(t % 60);
+	t /= 60;
+	m.tm_min = (int)(t % 60);
+	t /= 60;
+	m.tm_hour = (int)(t % 24);
+	t /= 24;
+	m.tm_wday = (int)((t + 4) % 7);
 
-    m.tm_year = (int) (t / 365 + 1);
-    do
-        {
-        m.tm_year--;
-        m.tm_yday = (int) (t - m.tm_year * 365 - ((m.tm_year + 1) / 4));
-        }
-    while(m.tm_yday < 0);
-    m.tm_year += 70;
+	m.tm_year = (int)(t / 365 + 1);
+	do {
+		m.tm_year--;
+		m.tm_yday = (int)(t - m.tm_year * 365 - ((m.tm_year + 1) / 4));
+	}
+	while (m.tm_yday < 0);
+	m.tm_year += 70;
 
-    LeapDay = ((m.tm_year & 3) == 0 && m.tm_yday >= _mdays [2]);
+	LeapDay = ((m.tm_year & 3) == 0 && m.tm_yday >= _mdays[2]);
 
-    for(m.tm_mon = m.tm_mday = 0; m.tm_mday == 0; m.tm_mon++)
-        if(m.tm_yday < _mdays [m.tm_mon + 1] + LeapDay)
-            m.tm_mday = m.tm_yday + 1 - (_mdays [m.tm_mon] + (m.tm_mon != 1 ? LeapDay : 0));
+	for (m.tm_mon = m.tm_mday = 0; m.tm_mday == 0; m.tm_mon++)
+		if (m.tm_yday < _mdays[m.tm_mon + 1] + LeapDay)
+			m.tm_mday =
+			    m.tm_yday + 1 - (_mdays[m.tm_mon] +
+					     (m.tm_mon != 1 ? LeapDay : 0));
 
-    m.tm_mon--;
+	m.tm_mon--;
 
-    m.tm_isdst = -1;
+	m.tm_isdst = -1;
 
-    return(&m);
+	return (&m);
 }
 
 #if defined(_WINDOWS)
@@ -848,17 +848,19 @@ JAMTMptr _JAMPROC JAMsysLocalTime(UINT32ptr pt)
 #if defined (__BORLANDC__)
 #pragma warn -par
 #endif
-int FAR PASCAL LibMain( HANDLE hInst, WORD wDataSeg, WORD cbHeapSize, LPSTR lpszCmdLine )
+int FAR PASCAL LibMain(HANDLE hInst, WORD wDataSeg, WORD cbHeapSize,
+		       LPSTR lpszCmdLine)
 {
 /*
 **  Unlock the data segment, that LocalInit() locks
 **  (LocalInit() is called from the assembler routine LibEntry()
 */
-  if( cbHeapSize != 0 )
-    UnlockData( 0 );
+	if (cbHeapSize != 0)
+		UnlockData(0);
 
-  return( TRUE );           /* Return success */
+	return (TRUE);		/* Return success */
 }
+
 #if defined (__BORLANDC__)
 #pragma warn .par
 #endif
@@ -875,10 +877,11 @@ int FAR PASCAL LibMain( HANDLE hInst, WORD wDataSeg, WORD cbHeapSize, LPSTR lpsz
 #if defined (__BORLANDC__)
 #pragma warn -par
 #endif
-int _JAMFAR _PASCAL _EXPORT WEP( int nParameter )
+int _JAMFAR _PASCAL _EXPORT WEP(int nParameter)
 {
-  return( TRUE );
+	return (TRUE);
 }
+
 #if defined (__BORLANDC__)
 #pragma warn .par
 #endif
