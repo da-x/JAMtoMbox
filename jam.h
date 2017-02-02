@@ -146,7 +146,7 @@ extern "C" {
 		UINT16 LoID;	/* Field ID, 0 - 0xffff */
 		UINT16 HiID;	/* Reserved for future use */
 		UINT32 DatLen;	/* Length of buffer that follows */
-		CHAR8 Buffer[1];	/* DatLen bytes of data */
+		CHAR8 Buffer[];	/* DatLen bytes of data */
 	} JAMSUBFIELD, _JAMDATA * JAMSUBFIELDptr;
 
 	typedef struct {

@@ -68,7 +68,7 @@ int _JAMPROC JAMmbScanForMsgHdr(JAMAPIRECptr apirec, UINT32 WhatMsg,
 				if (apirec->Hdr.SubfieldLen > 0) {
 					if (apirec->
 					    ReadFunc(apirec, apirec->HdrHandle,
-						     &apirec->WorkBuf,
+						     apirec->WorkBuf,
 						     (INT32) apirec->Hdr.
 						     SubfieldLen) !=
 					    (INT32) apirec->Hdr.SubfieldLen) {
@@ -104,7 +104,7 @@ int _JAMPROC JAMmbScanForMsgHdr(JAMAPIRECptr apirec, UINT32 WhatMsg,
 				do {
 					if (apirec->
 					    ReadFunc(apirec, apirec->HdrHandle,
-						     &apirec->WorkBuf,
+						     apirec->WorkBuf,
 						     MaxBlockToRead) !=
 					    MaxBlockToRead) {
 						apirec->APImsg =

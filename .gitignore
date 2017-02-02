@@ -1,2 +1,10 @@
 *.o
 *.a
+JAMtoMbox
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+scapaflow
+\#*
+.\#*
+Makefile
